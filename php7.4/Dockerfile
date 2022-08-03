@@ -20,18 +20,22 @@ ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
 ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"file"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
+ARG MYSQL_SOCKET_DIRECTORY='/var/run/mysqld'
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN apt-get update \
-    && apt-get install -y gosu gnupg wget lsb-release \
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime  \
+    && echo $TZ > /etc/timezone \
+    && apt-get update \
+    && apt-get install -y gosu gnupg wget lsb-release supervisor \
     && wget https://dev.mysql.com/get/mysql-apt-config_0.8.23-1_all.deb \
     && dpkg -i mysql-apt-config_0.8.23-1_all.deb \
     && echo mysql-community-server mysql-community-server/root-pass password 'password' | debconf-set-selections \
     && echo mysql-community-server mysql-community-server/re-root-pass password 'password' | debconf-set-selections \
     && apt-get update \
     && apt-get install -y default-mysql-server default-mysql-client \
-    && rm mysql-apt-config_0.8.23-1_all.deb
+    && rm mysql-apt-config_0.8.23-1_all.deb \
+    && mkdir -p $MYSQL_SOCKET_DIRECTORY \
+    && chown root:mysql $MYSQL_SOCKET_DIRECTORY \
+    && chmod 774 $MYSQL_SOCKET_DIRECTORY
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -52,8 +56,8 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
 RUN groupadd --force -g $WWWGROUP laravelci
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 laravelci
 
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY start-container /usr/local/bin/start-container
-COPY prepare-env /usr/local/bin/prepare-env
-CMD chmod +x /usr/local/bin/prepare-env
+RUN chmod +x /usr/local/bin/start-container
 
 ENTRYPOINT ["start-container"]
