@@ -13,3 +13,5 @@ chmod -R ugo+rw /.composer
 if [ $# -gt 0 ]; then
     exec gosu $WWWUSER "$@"
 fi
+
+prepare-env

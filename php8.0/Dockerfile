@@ -54,5 +54,6 @@ RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 laravelci
 
 COPY start-container /usr/local/bin/start-container
 COPY prepare-env /usr/local/bin/prepare-env
+CMD chmod +x /usr/local/bin/prepare-env
 
 ENTRYPOINT ["start-container"]
