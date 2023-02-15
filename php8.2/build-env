@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+if [ -f composer.json ]; then
+    composer install --prefer-dist
+fi
+
+if [ -n "$APP_KEY" ]; then
+    APP_KEY=$(php artisan key:generate --show)
+    export APP_KEY
+fi
+
+if [ -z "$NVM_DIR" ]; then
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+fi
+
+if [ -f package.json ]; then
+  nvm install "${NODE_VERSION:-18}"
+  nvm use "${NODE_VERSIOM:-18}"
+
+  npm ci
+fi
+
+if [ -f vite.config.js ]; then
+    npm run build
+elif [ -f webpack.mix.js ]; then
+    npm run prod
+fi
+
+alias test="php artisan test"
+export PATH="$PATH:/var/www/html/vendor/bin/"
