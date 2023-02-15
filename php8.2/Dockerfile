@@ -2,8 +2,8 @@ FROM ubuntu:22.04
 
 LABEL maintainer="Determined Development"
 
-ARG WWWGROUP=${WWWGROUP:-1000}
-ARG WWWUSER=${WWWUSER:-1000}
+ARG WWWGROUP=${WWWGROUP:-${GROUP:-1000}}
+ARG WWWUSER=${WWWUSER:-${UID:-1000}}
 
 WORKDIR /var/www/html
 
@@ -31,11 +31,11 @@ RUN apt-get update \
        php8.2-ldap \
        php8.2-msgpack php8.2-igbinary \
        php8.2-memcached php8.2-pcov php8.2-xdebug \
-    && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
-    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
 
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
@@ -44,11 +44,14 @@ ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
 ENV NODE_VERSION=${NODE_VERSION:-18}
 
 RUN groupadd --force -g $WWWGROUP laravelci
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 laravelci
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
 
 COPY start-container /usr/local/bin/start-container
 COPY build-env /usr/local/bin/build-env
+COPY nvm-install /usr/local/bin/nvm-install
 RUN chmod +x /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/build-env
+RUN chmod +x /usr/local/bin/nvm-install
 
 ENTRYPOINT ["start-container"]
+
