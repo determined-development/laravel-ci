@@ -8,19 +8,19 @@ on:
       - main
 
 jobs:
-  build-8.0:
+  build-80:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: '8.0'
       tags: 'ddsam/laravel-ci:8.0'
     secrets: inherit
-  build-8.1:
+  build-81:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: '8.1'
       tags: 'ddsam/laravel-ci:8.1'
     secrets: inherit
-  build-8.2:
+  build-82:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: '8.2'
