@@ -33,34 +33,26 @@ RUN apt-get update \
        php8.0-ldap \
        php8.0-msgpack php8.0-igbinary \
        php8.0-memcached php8.0-pcov php8.0-xdebug \
-    && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -sLS https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && npm install -g npm \
-    && echo mysql-server mysql-server/root-pass password 'password' | debconf-set-selections \
-    && echo mysql-server mysql-server/re-root-pass password 'password' | debconf-set-selections \
-    && apt-get install -y mysql-server mysql-client \
-    && mkdir -p $MYSQL_SOCKET_DIRECTORY \
-    && chown root:mysql $MYSQL_SOCKET_DIRECTORY \
-    && chmod 774 $MYSQL_SOCKET_DIRECTORY \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV DB_DATABASE=${DB_DATABASE:-"testing"}
-ENV DB_USERNAME=${DB_USERNAME:-"laravel"}
-ENV DB_PASSWORD=${DB_PASSWORD:-"password"}
+RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
 ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"file"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
+ENV NODE_VERSION=${NODE_VERSION:-16}
 
 RUN groupadd --force -g $WWWGROUP laravelci
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 laravelci
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY start-container /usr/local/bin/start-container
+COPY build-env /usr/local/bin/build-env
+COPY setup-node /usr/local/bin/setup-node
 RUN chmod +x /usr/local/bin/start-container
+RUN chmod +x /usr/local/bin/build-env
+RUN chmod +x /usr/local/bin/setup-node
 
 ENTRYPOINT ["start-container"]

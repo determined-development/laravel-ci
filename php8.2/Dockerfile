@@ -39,7 +39,7 @@ RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-d
 
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
-ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"file"}
+ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
 ENV NODE_VERSION=${NODE_VERSION:-18}
 
@@ -48,10 +48,10 @@ RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
 
 COPY start-container /usr/local/bin/start-container
 COPY build-env /usr/local/bin/build-env
-COPY nvm-install /usr/local/bin/nvm-install
+COPY setup-node /usr/local/bin/setup-node
 RUN chmod +x /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/build-env
-RUN chmod +x /usr/local/bin/nvm-install
+RUN chmod +x /usr/local/bin/setup-node
 
 ENTRYPOINT ["start-container"]
 

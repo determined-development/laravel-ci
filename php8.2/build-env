@@ -1,36 +1,57 @@
 #!/usr/bin/env bash
 
-if [ -f composer.json ]; then
-    composer install --prefer-dist
-fi
+INSTALL_COMPOSER=1
+GENERATE_KEY=1
+BUILD_ASSETS=0
 
-if [ -n "$APP_KEY" ]; then
-    APP_KEY=$(php artisan key:generate --show)
-    export APP_KEY
-fi
+USAGE="Usage: build-env [options]
+OPTIONS:
+ -c --skip-composer  Do not run composer install
+ -k --skip-key       Do not attempt to set the app key if it is missing
+ -a --assets         Install NPM and build assets
+ -h --help           Display this help and exit"
 
-if [ -f package.json ]; then
-  if [ ! -d ~/.nvm ]; then
-      nvm-install
-  fi
+while test $# != 0
+do
+    case "$1" in
+    -h|--help) echo "$USAGE"; exit 1;;
+    -k|--skip-key) INSTALL_COMPOSER=0 ;;
+    -c|--skip-composer) GENERATE_KEY=0 ;;
+    -a|--assets) BUILD_ASSETS=1 ;;
+    esac
+    shift
+done
 
-  if [ -z "$NVM_DIR" ]; then
-     export NVM_DIR="$HOME/.nvm"
-     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-  fi
-
-  nvm install "${NODE_VERSION:-18}"
-  nvm use "${NODE_VERSIOM:-18}"
-
-  npm ci
-  if [ -f vite.config.js ]; then
-      npm run build
-  elif [ -f webpack.mix.js ]; then
-      npm run prod
+if [ $INSTALL_COMPOSER ]; then
+  if [ -f composer.json ]; then
+      composer install --prefer-dist
   fi
 fi
 
+if [ $GENERATE_KEY ]; then
+  if [ -n "$APP_KEY" ]; then
+    APP_KEY=$(php artisan key:generate --show);
+    export APP_KEY;
+  fi
+fi
+
+if [ $BUILD_ASSETS ]; then
+  setup-node
+
+  if [ -f package.json ]; then
+    if [ -f package.lock ]; then
+      npm ci
+    else
+      npm install
+    fi
+
+    if [ -f vite.config.js ]; then
+        npm run build
+    elif [ -f webpack.mix.js ]; then
+        npm run prod
+    fi
+  fi
+fi
 
 alias test="php artisan test"
 export PATH="$PATH:/var/www/html/vendor/bin/"

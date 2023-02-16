@@ -1,8 +1,101 @@
 # laravel-ci
 A self-contained docker image for running CI on Laravel projects
 
-Should require minimal effort to test Laravel projects. Comes with in-built myqsl 8, and most common PHP extensions.
+Should require minimal effort to test Laravel projects. Comes with most common PHP extensions, and nvm for building node
+assets.
 
-Default environment is set to use local database for testing, send email through the "array" driver and use the "sync" queue driver
+Built on `ubuntu:22.04`
 
-Running the `prepare-env` script will autoconfigure the database, build composer and npm, set an app key (if one isn't already set), and attempt to build front-end assets.
+## Usage
+
+### ARGS
+Default build arguments are as follows:
+
+| ARG               | Description                          | Default            |
+|-------------------|--------------------------------------|--------------------|
+| `WWWUSER`         | The user ID to run as internally.    | `$UID` or `1000`   |
+| `WWWGROUP`        | The user group to run as internally. | `$GROUP` or `1000` |
+
+### ENV
+The following environment variables can be used to modify the container setup
+
+| ENV                | Description                | Default                             |
+|--------------------|----------------------------|-------------------------------------|
+| `CACHE_DRIVER`     | Cache Driver for testing   | `array`                             |
+| `SESSION_DRIVER`   | Session Driver for testing | `file`                              |
+| `QUEUE_CONNECTION` | Queue driver for testing   | `sync`                              |
+| `MAIL_MAILER`      | Mailer for testing         | `array`                             |
+| `NODE_VERSION`     | Node version to install    | `18` (php8.2) `16` (php8.0, php8.1) |
+
+Other Laravel environment variables can also be passed as required, or set with `.env` for running tests.
+
+### Preparing the environment
+Running the script `build-env` will install composer, and ensure that an app-key is set. You can pass the flag `-a` or
+`--assets` to install node, install npm packages, and attempt a production build.
+
+If you just want node installed, you can run the `setup-node` script.
+
+### Examples
+
+#### Bitbucket Pipelines
+```yaml
+image: 'ddsam/laravel-ci:php8.2'
+
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step:
+              name: PHPStan
+              script:
+                - build-env
+                - mkdir -p test-reports
+                - php vendor/bin/phpstan analyse --error-format=junit > ./test-reports/phpstan.xml
+              caches:
+                - composer
+          - step:
+              name: PHPCS
+              script:
+                - build-env
+                - mkdir -p test-reports
+                - php vendor/bin/phpcs ./ --report-junit=./test-reports/phpcs.xml
+              caches:
+                - composer
+          - step:
+              name: Pest
+              script:
+                - build-env
+                - php vendor/bin/pest --test
+              caches:
+                - composer
+          - step:
+              name: PHPunit
+              env:
+                - MYSQL_DATABASE: 'testing'
+                - MYSQL_USER: 'laravel'
+                - MYSQL_PASSWORD: 'password'
+              script:
+                - build-env --assets
+                - mkdir -p test-reports
+                - php artisan test --log-junit ./test-reports/phpunit.xml
+              caches:
+                - composer
+              services:
+                - mysql
+
+definitions:
+  services:
+    mysql:
+      image: mysql/mysql-server:8.0
+      variables:
+        MYSQL_DATABASE: 'testing'
+        MYSQL_USER: 'laravel'
+        MYSQL_PASSWORD: 'password'
+```
+
+## Versions
+The current supported versions are:
+
+* `ddsam/laravel-ci:php8.0` - PHP 8.0, Node 16 (default)
+* `ddsam/laravel-ci:php8.1` - PHP 8.1, Node 16 (default)
+* `ddsam/laravel-ci:php8.2` - PHP 8.2, Node 18 (default)

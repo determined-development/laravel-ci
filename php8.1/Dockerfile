@@ -2,9 +2,8 @@ FROM ubuntu:22.04
 
 LABEL maintainer="Determined Development"
 
-ARG WWWGROUP=${WWWGROUP:-1000}
-ARG WWWUSER=${WWWUSER:-1000}
-ARG NODE_VERSION=${NODE_VERSION:-16}
+ARG WWWGROUP=${WWWGROUP:-${GROUP:-1000}}
+ARG WWWUSER=${WWWUSER:-${UID:-1000}}
 
 WORKDIR /var/www/html
 
@@ -32,29 +31,26 @@ RUN apt-get update \
        php8.1-ldap \
        php8.1-msgpack php8.1-igbinary \
        php8.1-memcached php8.1-pcov php8.1-xdebug \
-    && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -sLS https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && npm install -g npm \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV DB_DATABASE=${DB_DATABASE:-"testing"}
-ENV DB_USERNAME=${DB_USERNAME:-"laravel"}
-ENV DB_PASSWORD=${DB_PASSWORD:-"password"}
+RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
 ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"file"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
+ENV NODE_VERSION=${NODE_VERSION:-16}
 
 RUN groupadd --force -g $WWWGROUP laravelci
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 laravelci
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
 
 COPY start-container /usr/local/bin/start-container
 COPY build-env /usr/local/bin/build-env
+COPY setup-node /usr/local/bin/setup-node
 RUN chmod +x /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/build-env
+RUN chmod +x /usr/local/bin/setup-node
 
 ENTRYPOINT ["start-container"]
