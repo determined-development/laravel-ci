@@ -1,5 +1,5 @@
 # laravel-ci
-A self-contained docker image for running CI on Laravel projects
+Docker images for running Laravel CI tasks
 
 Should require minimal effort to test Laravel projects. Comes with most common PHP extensions, and nvm for building node
 assets.
@@ -62,10 +62,10 @@ pipelines:
               caches:
                 - composer
           - step:
-              name: Pest
+              name: Pint
               script:
                 - build-env
-                - php vendor/bin/pest --test
+                - php vendor/bin/pint --test
               caches:
                 - composer
           - step:

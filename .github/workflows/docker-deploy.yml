@@ -1,0 +1,25 @@
+name: Deploy Docker Images
+
+on:
+  release:
+    types:
+      - release
+    branches:
+      - main
+
+jobs:
+  build-8.0:
+    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    with:
+      image-name: '8.0'
+    secrets: inherit
+  build-8.1:
+    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    with:
+      image-name: '8.1'
+    secrets: inherit
+  build-8.2:
+    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    with:
+      image-name: '8.2'
+    secrets: inherit

@@ -29,7 +29,7 @@ if [ $INSTALL_COMPOSER ]; then
 fi
 
 if [ $GENERATE_KEY ]; then
-  if [ -n "$APP_KEY" ]; then
+  if [ -z "$APP_KEY" ]; then
     APP_KEY=$(php artisan key:generate --show);
     export APP_KEY;
   fi
