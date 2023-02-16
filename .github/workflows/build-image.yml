@@ -32,4 +32,4 @@ jobs:
         with:
           context: "./${{ inputs.image-name }}/"
           push: true
-          tags: {{ inputs.tags }}
+          tags: ${{ inputs.tags }}
