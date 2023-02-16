@@ -27,6 +27,6 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: "./${{ inputs.image-name }}"
+          context: "./${{ inputs.image-name }}/"
           push: true
           tags: ddsam/laravel-ci:${{ inputs.image-name }}

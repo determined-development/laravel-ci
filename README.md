@@ -98,4 +98,10 @@ The current supported versions are:
 
 * `ddsam/laravel-ci:php8.0` - PHP 8.0, Node 16 (default)
 * `ddsam/laravel-ci:php8.1` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2` - PHP 8.2, Node 18 (default)
+* `ddsam/laravel-ci:php8.2` - PHP 8.2, Node 18 (default) - also available as `ddsam/laravel-ci:latest`
+
+### Pre-release versions
+Pre-releases get published as:
+* `ddsam/laravel-ci:php8.0-prerelease` - PHP 8.0, Node 16 (default)
+* `ddsam/laravel-ci:php8.1-prerelease` - PHP 8.1, Node 16 (default)
+* `ddsam/laravel-ci:php8.2-prerelease` - PHP 8.2, Node 18 (default)
