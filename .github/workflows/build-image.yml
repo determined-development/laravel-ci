@@ -6,6 +6,9 @@ on:
       image-name:
         required: true
         type: string
+      tags:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -29,4 +32,4 @@ jobs:
         with:
           context: "./${{ inputs.image-name }}/"
           push: true
-          tags: ddsam/laravel-ci:${{ inputs.image-name }}
+          tags: {{ inputs.tags }}
