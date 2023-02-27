@@ -6,20 +6,20 @@ BUILD_ASSETS=0
 
 USAGE="Usage: build-env [options]
 OPTIONS:
- -c --skip-composer  Do not run composer install
- -k --skip-key       Do not attempt to set the app key if it is missing
- -a --assets         Install NPM and build assets
- -h --help           Display this help and exit"
+ -h Display this help and exit
+ -c Do not run composer install
+ -k Do not attempt to set the app key if it is missing
+ -a Install NPM and build assets"
 
-while test $# != 0
+while getopts 'hkca' OPTION
 do
-    case "$1" in
-    -h|--help) echo "$USAGE"; exit 1;;
-    -k|--skip-key) GENERATE_KEY=0 ;;
-    -c|--skip-composer) INSTALL_COMPOSER=0 ;;
-    -a|--assets) BUILD_ASSETS=1 ;;
+    case "$OPTION" in
+    h) echo "$USAGE"; exit 1;;
+    k) GENERATE_KEY=0 ;;
+    c) INSTALL_COMPOSER=0 ;;
+    a) BUILD_ASSETS=1 ;;
+    *) ;;
     esac
-    shift
 done
 
 if [ $INSTALL_COMPOSER ]; then

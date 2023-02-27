@@ -30,8 +30,8 @@ The following environment variables can be used to modify the container setup
 Other Laravel environment variables can also be passed as required, or set with `.env` for running tests.
 
 ### Preparing the environment
-Running the script `build-env` will install composer, and ensure that an app-key is set. You can pass the flag `-a` or
-`--assets` to install node, install npm packages, and attempt a production build.
+Running the script `build-env` will install composer, and ensure that an app-key is set. You can pass the flag `-a` to
+install node, install npm packages, and attempt a production build.
 
 If you just want node installed, you can run the `setup-node` script.
 
@@ -39,7 +39,7 @@ If you just want node installed, you can run the `setup-node` script.
 
 #### Bitbucket Pipelines
 ```yaml
-image: 'ddsam/laravel-ci:php8.2'
+image: 'ddsam/laravel-ci:php8.2-latest'
 
 pipelines:
   pull-requests:
@@ -75,7 +75,7 @@ pipelines:
                 - MYSQL_USER: 'laravel'
                 - MYSQL_PASSWORD: 'password'
               script:
-                - build-env --assets
+                - build-env --a
                 - mkdir -p test-reports
                 - php artisan test --log-junit ./test-reports/phpunit.xml
               caches:
@@ -96,9 +96,9 @@ definitions:
 ## Versions
 The current supported versions are:
 
-* `ddsam/laravel-ci:php8.0` - PHP 8.0, Node 16 (default)
-* `ddsam/laravel-ci:php8.1` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2` - PHP 8.2, Node 18 (default) - also available as `ddsam/laravel-ci:latest`
+* `ddsam/laravel-ci:php8.0-latest` - PHP 8.0, Node 16 (default)
+* `ddsam/laravel-ci:php8.1-latest` - PHP 8.1, Node 16 (default)
+* `ddsam/laravel-ci:php8.2-latest` - PHP 8.2, Node 18 (default)
 
 ### Pre-release versions
 Pre-releases get published as:
