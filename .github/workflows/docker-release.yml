@@ -12,7 +12,7 @@ jobs:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: 'php8.0'
-      tags: "ddsam/laravel-ci:php8.0,ddsam/laravel-ci:php8.0-${{github.ref_name}},ddsam/laravel-ci:-php8.0-latest"
+      tags: "ddsam/laravel-ci:php8.0,ddsam/laravel-ci:php8.0-${{github.ref_name}},ddsam/laravel-ci:php8.0-latest"
     secrets: inherit
   build-81:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
