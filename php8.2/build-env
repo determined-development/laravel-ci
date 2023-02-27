@@ -2,6 +2,7 @@
 
 INSTALL_COMPOSER=1
 GENERATE_KEY=1
+INSTALL_NODE=1
 BUILD_ASSETS=0
 
 USAGE="Usage: build-env [options]
@@ -9,14 +10,16 @@ OPTIONS:
  -h Display this help and exit
  -c Do not run composer install
  -k Do not attempt to set the app key if it is missing
+ -n Do set up NPM/Node.js
  -a Install NPM and build assets"
 
-while getopts 'hkca' OPTION
+while getopts 'hkcan' OPTION
 do
     case "$OPTION" in
     h) echo "$USAGE"; exit 1;;
-    k) GENERATE_KEY=0 ;;
     c) INSTALL_COMPOSER=0 ;;
+    k) GENERATE_KEY=0 ;;
+    n) INSTALL_NODE=0 ;;
     a) BUILD_ASSETS=1 ;;
     *) ;;
     esac
@@ -35,9 +38,11 @@ if [ $GENERATE_KEY ]; then
   fi
 fi
 
-if [ $BUILD_ASSETS ]; then
+if [[ $INSTALL_NODE || $BUILD_ASSETS ]]; then
   setup-node
+fi
 
+if [ $BUILD_ASSETS ]; then
   if [ -f package.json ]; then
     if [ -f package.lock ]; then
       npm ci

@@ -48,7 +48,7 @@ pipelines:
           - step:
               name: PHPStan
               script:
-                - build-env
+                - build-env -n
                 - mkdir -p test-reports
                 - php vendor/bin/phpstan analyse --error-format=junit > ./test-reports/phpstan.xml
               caches:
@@ -56,7 +56,7 @@ pipelines:
           - step:
               name: PHPCS
               script:
-                - build-env
+                - build-env -n
                 - mkdir -p test-reports
                 - php vendor/bin/phpcs ./ --report-junit=./test-reports/phpcs.xml
               caches:
@@ -64,7 +64,7 @@ pipelines:
           - step:
               name: Pint
               script:
-                - build-env
+                - build-env -n
                 - php vendor/bin/pint --test
               caches:
                 - composer
@@ -75,8 +75,9 @@ pipelines:
                 - MYSQL_USER: 'laravel'
                 - MYSQL_PASSWORD: 'password'
               script:
-                - build-env --a
+                - build-env
                 - mkdir -p test-reports
+                - build-env -a
                 - php artisan test --log-junit ./test-reports/phpunit.xml
               caches:
                 - composer
