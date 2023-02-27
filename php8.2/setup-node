@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 if [ -z "$NVM_DIR" ]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  if [ ! -d "$HOME/.nvm/" ]; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  fi
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
@@ -12,5 +14,4 @@ NODE_VERSION="${NODE_VERSION:-18}"
 if [[ $(nvm ls | grep "$NODE_VERSION") == "" ]]; then
   nvm install "$NODE_VERSION"
 fi
-nvm alias default "$NODE_VERSION"
 nvm use "$NODE_VERSION"

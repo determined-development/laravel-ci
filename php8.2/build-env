@@ -39,7 +39,7 @@ if [ $GENERATE_KEY ]; then
 fi
 
 if [[ $INSTALL_NODE || $BUILD_ASSETS ]]; then
-  setup-node
+  source setup-node
 fi
 
 if [ $BUILD_ASSETS ]; then
