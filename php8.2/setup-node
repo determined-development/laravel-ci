@@ -12,4 +12,5 @@ NODE_VERSION="${NODE_VERSION:-18}"
 if [[ $(nvm ls | grep "$NODE_VERSION") == "" ]]; then
   nvm install "$NODE_VERSION"
 fi
+nvm alias default "$NODE_VERSION"
 nvm use "$NODE_VERSION"
