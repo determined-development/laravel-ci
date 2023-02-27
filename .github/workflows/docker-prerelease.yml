@@ -12,17 +12,17 @@ jobs:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: 'php8.0'
-      tags: 'ddsam/laravel-ci:php8.0-prerelease'
+      tags: 'ddsam/laravel-ci:php8.0-${{github.ref_name}}-prerelease,ddsam/laravel-ci:php8.0-prerelease'
     secrets: inherit
   build-81:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: 'php8.1'
-      tags: 'ddsam/laravel-ci:php8.1-prerelease'
+      tags: 'ddsam/laravel-ci:php8.1-${{github.ref_name}}-prerelease,ddsam/laravel-ci:php8.1-prerelease'
     secrets: inherit
   build-82:
     uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
     with:
       image-name: 'php8.2'
-      tags: 'ddsam/laravel-ci:php8.2-prerelease'
+      tags: 'ddsam/laravel-ci:php8.2-${{github.ref_name}}-prerelease,ddsam/laravel-ci:php8.2-prerelease'
     secrets: inherit
