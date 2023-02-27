@@ -15,8 +15,8 @@ while test $# != 0
 do
     case "$1" in
     -h|--help) echo "$USAGE"; exit 1;;
-    -k|--skip-key) INSTALL_COMPOSER=0 ;;
-    -c|--skip-composer) GENERATE_KEY=0 ;;
+    -k|--skip-key) GENERATE_KEY=0 ;;
+    -c|--skip-composer) INSTALL_COMPOSER=0 ;;
     -a|--assets) BUILD_ASSETS=1 ;;
     esac
     shift
