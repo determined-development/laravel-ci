@@ -9,20 +9,46 @@ on:
 
 jobs:
   build-80:
-    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    uses: ./.github/workflows/build-image.yml
     with:
-      image-name: 'php8.0'
-      tags: "ddsam/laravel-ci:php8.0,ddsam/laravel-ci:php8.0-${{github.ref_name}},ddsam/laravel-ci:php8.0-latest"
+      tags: |
+        ddsam/laravel-ci:php8.0
+        ddsam/laravel-ci:php8.0-${{github.ref_name}}
+        ddsam/laravel-ci:php8.0-latest
+      args: |
+        PHP_VERSION=8.0
+        NODE_VERSION=16
     secrets: inherit
   build-81:
-    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    uses: ./.github/workflows/build-image.yml
     with:
-      image-name: 'php8.1'
-      tags: 'ddsam/laravel-ci:php8.1,ddsam/laravel-ci:php8.1-${{github.ref_name}},ddsam/laravel-ci:php8.1-latest'
+      tags: |
+        ddsam/laravel-ci:php8.1
+        ddsam/laravel-ci:php8.1-${{github.ref_name}}
+        ddsam/laravel-ci:php8.1-latest
+      args: |
+        PHP_VERSION=8.1
+        NODE_VERSION=18
     secrets: inherit
   build-82:
-    uses: determined-development/laravel-ci/.github/workflows/build-image.yml@main
+    uses: ./.github/workflows/build-image.yml
     with:
-      image-name: 'php8.2'
-      tags: 'ddsam/laravel-ci:php8.2,ddsam/laravel-ci:php8.2-${{github.ref_name}},ddsam/laravel-ci:php8.2-latest'
+      tags: |
+        ddsam/laravel-ci:php8.2
+        ddsam/laravel-ci:php8.2-${{github.ref_name}}
+        ddsam/laravel-ci:php8.2-latest
+      args: |
+        PHP_VERSION=8.2
+        NODE_VERSION=18
+    secrets: inherit
+  build-83:
+    uses: ./.github/workflows/build-image.yml
+    with:
+      tags: |
+        ddsam/laravel-ci:php8.3
+        ddsam/laravel-ci:php8.3-${{github.ref_name}}
+        ddsam/laravel-ci:php8.3-latest
+      args: |
+        PHP_VERSION=8.3
+        NODE_VERSION=20
     secrets: inherit

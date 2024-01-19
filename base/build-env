@@ -1,17 +1,40 @@
 #!/usr/bin/env bash
 
+NODE_EXISTS=0
+if [ -f package.json ]; then
+    NODE_EXISTS=1
+fi
+
+NODE_INSTALLED=0
+if [ $NODE_EXISTS ] && [ -d node_modules ]; then
+    NODE_INSTALLED=1
+fi
+
+COMPOSER_INSTALLED=0
+if [ -d vendor ]; then
+  COMPOSER_INSTALLED=1
+fi
+
 INSTALL_COMPOSER=1
 GENERATE_KEY=1
 INSTALL_NODE=1
 BUILD_ASSETS=0
+
+if [ $NODE_EXISTS ] && [ $NODE_INSTALLED -eq 0 ]; then
+    INSTALL_NODE=1
+fi
+
+if [ $COMPOSER_INSTALLED ]; then
+    INSTALL_COMPOSER=0
+fi
 
 USAGE="Usage: build-env [options]
 OPTIONS:
  -h Display this help and exit
  -c Do not run composer install
  -k Do not attempt to set the app key if it is missing
- -n Do set up NPM/Node.js
- -a Install NPM and build assets"
+ -n Do set run npm install
+ -a Build frontend assets"
 
 while getopts 'hkcan' OPTION
 do
@@ -38,25 +61,19 @@ if [ $GENERATE_KEY ]; then
   fi
 fi
 
-if [[ $INSTALL_NODE || $BUILD_ASSETS ]]; then
-  source setup-node
+if [ $INSTALL_NODE ]; then
+  if [ -f package.lock ]; then
+    npm ci
+  else
+    npm install
+  fi
+  NODE_INSTALLED=1
 fi
 
 if [ $BUILD_ASSETS ]; then
-  if [ -f package.json ]; then
-    if [ -f package.lock ]; then
-      npm ci
-    else
-      npm install
-    fi
-
-    if [ -f vite.config.js ]; then
-        npm run build
-    elif [ -f webpack.mix.js ]; then
-        npm run prod
-    fi
+  if [ -f vite.config.js ]; then
+      npm run build
+  elif [ -f webpack.mix.js ]; then
+      npm run prod
   fi
 fi
-
-alias test="php artisan test"
-export PATH="$PATH:/var/www/html/vendor/bin/"

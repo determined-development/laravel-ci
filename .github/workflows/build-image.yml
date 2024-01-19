@@ -3,10 +3,10 @@ name: Build Image
 on:
   workflow_call:
     inputs:
-      image-name:
+      tags:
         required: true
         type: string
-      tags:
+      args:
         required: true
         type: string
 
@@ -30,6 +30,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: "{{defaultContext}}:${{ inputs.image-name }}"
+          context: "{{defaultContext}}:base"
           push: true
           tags: ${{ inputs.tags }}
+          build-args: ${{ inputs.args }}
