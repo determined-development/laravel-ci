@@ -14,7 +14,7 @@ if [ -n "$SRC_PATH" ] && [ "$(realpath "$PWD")" != "$(realpath "$SRC_PATH")" ] &
 fi
 
 if [ $# -gt 0 ]; then
-    exec gosu laravelci "$@"
+    exec gosu $WWWUSER "$@"
 else
-    exec gosu laravelci build-env
+    exec gosu $WWWUSER build-env
 fi

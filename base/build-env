@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+set -e
+
+RED="\e[31m"
+GREEN="\e[32m"
+CODE="\e[1;34;40m"
+ENDCOLOR="\e[0m"
+
 NODE_EXISTS=0
 if [ -f package.json ]; then
     NODE_EXISTS=1
 fi
 
 NODE_INSTALLED=0
-if [ $NODE_EXISTS ] && [ -d node_modules ]; then
+if [ $NODE_EXISTS -eq 1 ] && [ -d node_modules ]; then
     NODE_INSTALLED=1
 fi
 
@@ -20,11 +27,7 @@ GENERATE_KEY=1
 INSTALL_NODE=1
 BUILD_ASSETS=0
 
-if [ $NODE_EXISTS ] && [ $NODE_INSTALLED -eq 0 ]; then
-    INSTALL_NODE=1
-fi
-
-if [ $COMPOSER_INSTALLED ]; then
+if [ $COMPOSER_INSTALLED -eq 1 ]; then
     INSTALL_COMPOSER=0
 fi
 
@@ -33,7 +36,7 @@ OPTIONS:
  -h Display this help and exit
  -c Do not run composer install
  -k Do not attempt to set the app key if it is missing
- -n Do set run npm install
+ -n Do not run npm install
  -a Build frontend assets"
 
 while getopts 'hkcan' OPTION
@@ -48,32 +51,50 @@ do
     esac
 done
 
-if [ $INSTALL_COMPOSER ]; then
+if [ $INSTALL_COMPOSER -eq 1 ] && [ $COMPOSER_INSTALLED -eq 0 ]; then
   if [ -f composer.json ]; then
+      echo -e "${GREEN}Installing composer${ENDCOLOR}"
       composer install --prefer-dist
+  else
+      echo -e "${RED}Cannot install composer${ENDCOLOR}: Cannot find \`${CODE}${PWD}/composer.json${ENDCOLOR}\`"
   fi
 fi
 
-if [ $GENERATE_KEY ]; then
+if [ $GENERATE_KEY -eq 1 ]; then
   if [ -z "$APP_KEY" ]; then
+    echo -e "Generating ${CODE}APP_KEY${ENDCOLOR} with \`${CODE}php artisan key:generate${ENDCOLOR}\`"
     APP_KEY=$(php artisan key:generate --show);
     export APP_KEY;
   fi
 fi
 
-if [ $INSTALL_NODE ]; then
-  if [ -f package.lock ]; then
-    npm ci
+if [ $INSTALL_NODE -eq 1 ] && [ $NODE_INSTALLED -eq 0 ]; then
+  if [ $NODE_EXISTS -eq 0 ]; then
+    echo -e "${RED}Cannot install npm${ENDCOLOR}: Cannot find \`${CODE}${PWD}/package.json${ENDCOLOR}\`"
   else
-    npm install
+    if [ -f package.lock ]; then
+      echo -e "${GREEN}Installing NPM modules${ENDCOLOR}: running \`${CODE}npm ci${ENDCOLOR}\`"
+      npm ci
+    else
+      echo -e "${GREEN}Installing NPM modules${ENDCOLOR}: running \`${CODE}npm install${ENDCOLOR}\`"
+      npm install
+    fi
+    NODE_INSTALLED=1
   fi
-  NODE_INSTALLED=1
 fi
 
-if [ $BUILD_ASSETS ]; then
-  if [ -f vite.config.js ]; then
-      npm run build
-  elif [ -f webpack.mix.js ]; then
-      npm run prod
+if [ $BUILD_ASSETS -eq 1 ]; then
+  if [ $NODE_INSTALLED -eq 1 ]; then
+    if [ -f vite.config.js ]; then
+        echo -e "${GREEN}Building assets with vite${ENDCOLOR}"
+        npm run build
+    elif [ -f webpack.mix.js ]; then
+        echo -e "${GREEN}Building assets with mix${ENDCOLOR}"
+        npm run prod
+    else
+      echo -e "${RED}Cannot build assets${ENDCOLOR}: Cannot find \`${CODE}${PWD}/vite.config.js${ENDCOLOR}\` or \`${CODE}${PWD}/webpack.mix.js${ENDCOLOR}\`"
+    fi
+  else
+    echo -e "${RED}Cannot build assets${ENDCOLOR}: NPM modules are not installed"
   fi
 fi
