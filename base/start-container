@@ -9,6 +9,14 @@ if [ ! -d /.composer ]; then
 fi
 chmod -R ugo+rw /.composer
 
+if [ -d ".composer/vendor/bin" ] ; then
+    PATH=".composer/vendor/bin:$PATH"
+fi
+
+if [ -d "$HOME/.config/composer/vendor/bin" ] ; then
+    PATH="$HOME/.config/composer/vendor/bin:$PATH"
+fi
+
 if [ -n "$SRC_PATH" ] && [ "$(realpath "$PWD")" != "$(realpath "$SRC_PATH")" ] && [ -d "$SRC_PATH" ]; then
     cd "$SRC_PATH" || exit 1
 fi
