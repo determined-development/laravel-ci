@@ -33,8 +33,7 @@ OPTIONS:
  -h Display this help and exit
  -c Run composer install
  -k Set the app key if it is missing
- -n Run npm install
- -b Build everything possible to build"
+ -n Run npm install"
 
 while getopts 'hkcan' OPTION
 do
@@ -44,7 +43,6 @@ do
     k) GENERATE_KEY=1 ;;
     n) INSTALL_NODE=1 ;;
     a) BUILD_ASSETS=1 ;;
-    b) INSTALL_COMPOSER=1 ; GENERATE_KEY=1 ; INSTALL_NODE=1 ; BUILD_ASSETS=1 ;;
     *) ;;
     esac
 done
@@ -60,11 +58,24 @@ if [ $INSTALL_COMPOSER -eq 1 ]; then
 fi
 
 if [ $GENERATE_KEY -eq 1 ]; then
+  # No .env, but a .env.ci, so use the .env.ci
+  if [[ ! -f .env ]] && [[ -f .env.ci ]]; then
+    cp .env.ci .env
+  fi
+  # No app key defined, but we have a .env - load it into the environment
+  if [[ -z "$APP_KEY" ]] && [[ -f .env ]]; then
+    set -o allexport
+    source .env set
+    +o allexport
+  fi
+  # No app key set. Use artisan to generate one
   if [ -z "$APP_KEY" ]; then
-    if [ $COMPOSER_INSTALLED -eq 1 ]; then
+    if [[ $COMPOSER_INSTALLED -eq 1 ]] && [[ -f artisan ]]; then
       echo -e "Generating ${CODE}APP_KEY${ENDCOLOR} with \`${CODE}php artisan key:generate${ENDCOLOR}\`"
       APP_KEY=$(php artisan key:generate --show);
       export APP_KEY;
+    elif [[ $COMPOSER_INSTALLED -eq 1 ]]
+      echo -e "${RED}Cannot set application key${ENDCOLOR}: \`${CODE}artisan${ENDCOLOR}\` does not exist"
     else
       echo -e "${RED}Cannot set application key${ENDCOLOR}: Composer not installed"
     fi
