@@ -17,8 +17,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY start-container /usr/local/bin/start-container
 COPY build-env /usr/local/bin/build-env
+COPY composer-path /etc/profile.d/composer-path
 RUN chmod +x /usr/local/bin/start-container \
-    && chmod +x /usr/local/bin/build-env
+    && chmod a+x /usr/local/bin/build-env \
+    && chmod a+x /etc/profile.d/composer-path
 
 RUN apt-get update \
     && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 \
@@ -59,6 +61,11 @@ ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
 ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
 ENV SRC_PATH=${SRC_PATH:-"/var/www/html"}
+
+RUN mkdir /.composer \
+    && chmod -R ugo+rw /.composer
+
+CMD ["build-env", "-c", "-k"]
 
 ENTRYPOINT ["start-container"]
 

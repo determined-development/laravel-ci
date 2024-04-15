@@ -39,7 +39,7 @@ jobs:
         ddsam/laravel-ci:php8.2-latest
       args: |
         PHP_VERSION=8.2
-        NODE_VERSION=18
+        NODE_VERSION=20
     secrets: inherit
   build-83:
     uses: ./.github/workflows/build-image.yml

@@ -22,39 +22,38 @@ if [ -d vendor ]; then
   COMPOSER_INSTALLED=1
 fi
 
-INSTALL_COMPOSER=1
-GENERATE_KEY=1
-INSTALL_NODE=1
+INSTALL_COMPOSER=0
+GENERATE_KEY=0
+INSTALL_NODE=0
 BUILD_ASSETS=0
-
-if [ $COMPOSER_INSTALLED -eq 1 ]; then
-    INSTALL_COMPOSER=0
-fi
 
 USAGE="Usage: build-env [options]
 OPTIONS:
+ -a Build frontend assets
  -h Display this help and exit
- -c Do not run composer install
- -k Do not attempt to set the app key if it is missing
- -n Do not run npm install
- -a Build frontend assets"
+ -c Run composer install
+ -k Set the app key if it is missing
+ -n Run npm install
+ -b Build everything possible to build"
 
 while getopts 'hkcan' OPTION
 do
     case "$OPTION" in
     h) echo "$USAGE"; exit 1;;
-    c) INSTALL_COMPOSER=0 ;;
-    k) GENERATE_KEY=0 ;;
-    n) INSTALL_NODE=0 ;;
+    c) INSTALL_COMPOSER=1 ;;
+    k) GENERATE_KEY=1 ;;
+    n) INSTALL_NODE=1 ;;
     a) BUILD_ASSETS=1 ;;
+    b) INSTALL_COMPOSER=1 ; GENERATE_KEY=1 ; INSTALL_NODE=1 ; BUILD_ASSETS=1 ;;
     *) ;;
     esac
 done
 
-if [ $INSTALL_COMPOSER -eq 1 ] && [ $COMPOSER_INSTALLED -eq 0 ]; then
+if [ $INSTALL_COMPOSER -eq 1 ]; then
   if [ -f composer.json ]; then
       echo -e "${GREEN}Installing composer${ENDCOLOR}"
       composer install --prefer-dist
+      COMPOSER_INSTALLED=1
   else
       echo -e "${RED}Cannot install composer${ENDCOLOR}: Cannot find \`${CODE}${PWD}/composer.json${ENDCOLOR}\`"
   fi
@@ -62,13 +61,17 @@ fi
 
 if [ $GENERATE_KEY -eq 1 ]; then
   if [ -z "$APP_KEY" ]; then
-    echo -e "Generating ${CODE}APP_KEY${ENDCOLOR} with \`${CODE}php artisan key:generate${ENDCOLOR}\`"
-    APP_KEY=$(php artisan key:generate --show);
-    export APP_KEY;
+    if [ $COMPOSER_INSTALLED -eq 1 ]; then
+      echo -e "Generating ${CODE}APP_KEY${ENDCOLOR} with \`${CODE}php artisan key:generate${ENDCOLOR}\`"
+      APP_KEY=$(php artisan key:generate --show);
+      export APP_KEY;
+    else
+      echo -e "${RED}Cannot set application key${ENDCOLOR}: Composer not installed"
+    fi
   fi
 fi
 
-if [ $INSTALL_NODE -eq 1 ] && [ $NODE_INSTALLED -eq 0 ]; then
+if [ $INSTALL_NODE -eq 1 ]; then
   if [ $NODE_EXISTS -eq 0 ]; then
     echo -e "${RED}Cannot install npm${ENDCOLOR}: Cannot find \`${CODE}${PWD}/package.json${ENDCOLOR}\`"
   else
