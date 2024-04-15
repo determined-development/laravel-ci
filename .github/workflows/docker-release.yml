@@ -1,4 +1,4 @@
-name: Deploy Docker Prerelease Images
+name: Deploy Docker Release Images
 
 on:
   release:
@@ -18,14 +18,13 @@ jobs:
             node: 16
           - php: 8.1
             node: 18
-    steps:
-      - uses: ./.github/workflows/build-image.yml
-        with:
-          tags: |
-            ddsam/laravel-ci:php${{matrix.php}}
-            ddsam/laravel-ci:php${{matrix.php}}-${{github.ref_name}}
-          args: |
-            PHP_VERSION=${{matrix.php}}
-            NODE_VERSION=${{matrix.node}}
-          secrets: inherit
+      uses: ./.github/workflows/build-image.yml
+      with:
+        tags: |
+          ddsam/laravel-ci:php${{matrix.php}}
+          ddsam/laravel-ci:php${{matrix.php}}-${{github.ref_name}}
+        args: |
+          PHP_VERSION=${{matrix.php}}
+          NODE_VERSION=${{matrix.node}}
+        secrets: inherit
 
