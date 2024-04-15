@@ -55,6 +55,7 @@ RUN apt-get update \
 
 RUN groupadd --force -g $WWWGROUP laravelci
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
+RUN cat /etc/profile.d/composer-path >> /home/laravelci/.profile
 
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}

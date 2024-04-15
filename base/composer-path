@@ -1,3 +1,2 @@
-#!/usr/bin/env bash
 
 PATH="$HOME/.config/composer/vendor/bin:/.composer/vendor/bin:$PATH"
