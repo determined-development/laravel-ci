@@ -26,5 +26,5 @@ jobs:
       args: |
         PHP_VERSION=${{matrix.php}}
         NODE_VERSION=${{matrix.node}}
-      secrets: inherit
+    secrets: inherit
 
