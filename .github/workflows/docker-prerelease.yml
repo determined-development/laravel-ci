@@ -1,4 +1,4 @@
-name: Deploy Docker Images
+name: Deploy Docker Prerelease Images
 
 on:
   release:
@@ -8,43 +8,24 @@ on:
       - main
 
 jobs:
-  build-80:
-    uses: ./.github/workflows/build-image.yml
-    with:
-      tags: |
-        ddsam/laravel-ci:php8.0-prerelease
-        ddsam/laravel-ci:php8.0-${{github.ref_name}}-prerelease
-      args: |
-        PHP_VERSION=8.0
-        NODE_VERSION=16
-    secrets: inherit
-  build-81:
-    uses: ./.github/workflows/build-image.yml
-    with:
-      tags: |
-        ddsam/laravel-ci:php8.1-prerelease
-        ddsam/laravel-ci:php8.1-${{github.ref_name}}-prerelease
-      args: |
-        PHP_VERSION=8.1
-        NODE_VERSION=16
-    secrets: inherit
-  build-82:
-    uses: ./.github/workflows/build-image.yml
-    with:
-      tags: |
-        ddsam/laravel-ci:php8.2-prerelease
-        ddsam/laravel-ci:php8.2-${{github.ref_name}}-prerelease
-      args: |
-        PHP_VERSION=8.2
-        NODE_VERSION=18
-    secrets: inherit
-  build-83:
-    uses: ./.github/workflows/build-image.yml
-    with:
-      tags: |
-        ddsam/laravel-ci:php8.3-prerelease
-        ddsam/laravel-ci:php8.3-${{github.ref_name}}-prerelease
-      args: |
-        PHP_VERSION=8.3
-        NODE_VERSION=20
-    secrets: inherit
+  build_matrix:
+    strategy:
+      matrix:
+        php: [8.0, 8.1, 8.2, 8.3]
+        node: [20]
+        include:
+          - php: 8.0
+            node: 16
+          - php: 8.1
+            node: 18
+    steps:
+      - uses: ./.github/workflows/build-image.yml
+        with:
+          tags: |
+            ddsam/laravel-ci:php${{matrix.php}}-prerelease
+            ddsam/laravel-ci:php${{matrix.php}}-${{github.ref_name}}-prerelease
+          args: |
+            PHP_VERSION=${{matrix.php}}
+            NODE_VERSION=${{matrix.node}}
+          secrets: inherit
+
