@@ -47,7 +47,24 @@ If you just want node installed, you can run the `setup-node` script.
 #### Bitbucket Pipelines
 
 ```yaml
-image: 'ddsam/laravel-ci:php8.2-latest'
+image: 'ddsam/laravel-ci:php8.3-latest'
+
+definitions:
+  caches:
+    vendor:
+      key:
+        files:
+          - composer.json
+          - composer.lock
+      path: vendor
+
+  services:
+    mysql:
+      image: mysql/mysql-server:8.0
+      variables:
+        MYSQL_DATABASE: 'testing'
+        MYSQL_USER: 'laravel'
+        MYSQL_PASSWORD: 'password'
 
 pipelines:
   pull-requests:
@@ -56,45 +73,44 @@ pipelines:
           name: Prepare environment for testing
           caches:
             - composer
-            - node
+            - vendor
           script:
-            - build-env -n
+            - build-env -c -k
           artifacts:
-            - vendor/**
             - '.env'
       - parallel:
           - step:
               name: PHPStan
+              caches:
+                - vendor
               script:
                 - php vendor/bin/phpstan analyse
           - step:
               name: PHPCS
+              caches:
+                - vendor
               script:
                 - php vendor/bin/phpcs ./
           - step:
               name: Pint
+              caches:
+                - vendor
               script:
                 - php vendor/bin/pint --test
           - step:
               name: PHPunit
+              caches:
+                - vendor
+                - node
               env:
                 - MYSQL_DATABASE: 'testing'
                 - MYSQL_USER: 'laravel'
                 - MYSQL_PASSWORD: 'password'
               script:
-                - build-env -c -k -a
+                - build-env -n -a
                 - php artisan test
               services:
                 - mysql
-
-definitions:
-  services:
-    mysql:
-      image: mysql/mysql-server:8.0
-      variables:
-        MYSQL_DATABASE: 'testing'
-        MYSQL_USER: 'laravel'
-        MYSQL_PASSWORD: 'password'
 ```
 
 ## Versions
@@ -103,7 +119,7 @@ The current supported versions are:
 
 * `ddsam/laravel-ci:php8.0-latest` - PHP 8.0, Node 16 (default)
 * `ddsam/laravel-ci:php8.1-latest` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2-latest` - PHP 8.2, Node 18 (default)
+* `ddsam/laravel-ci:php8.2-latest` - PHP 8.2, Node 20 (default)
 * `ddsam/laravel-ci:php8.3-latest` - PHP 8.3, Node 20 (default)
 
 ### Pre-release versions
@@ -112,5 +128,5 @@ Pre-releases get published as:
 
 * `ddsam/laravel-ci:php8.0-prerelease` - PHP 8.0, Node 16 (default)
 * `ddsam/laravel-ci:php8.1-prerelease` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2-prerelease` - PHP 8.2, Node 18 (default)
+* `ddsam/laravel-ci:php8.2-prerelease` - PHP 8.2, Node 20 (default)
 * `ddsam/laravel-ci:php8.3-prerelease` - PHP 8.3, Node 20 (default)
