@@ -62,9 +62,6 @@ ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
 ENV SRC_PATH=${SRC_PATH:-"/var/www/html"}
 
-RUN mkdir /.composer \
-    && chmod -R ugo+rw /.composer
-
 CMD ["build-env", "-c", "-k"]
 
 ENTRYPOINT ["start-container"]
