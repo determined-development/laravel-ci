@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+composer global require "squizlabs/php_codesniffer=*"
+
+if [ -f $HOME/.config/composer/vendor/bin/phpcs ]; then
+    echo "Global installation failed";
+    exit 1;
+elif [ -z $(phpcs --version) ]; then
+    echo "Global binary not available";
+    exit 1;
+fi
