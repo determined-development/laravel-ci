@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+. build-env -a
+
+if [ -z "$APP_KEY" ]; then
+  echo "APP_KEY not set";
+  exit 1;
+elif [ "$APP_KEY" ne "test" ]; then
+  echo "'$APP_KEY' does not match expected value 'test'";
+  exit 1;
+fi
+
+if [ ! -f '.env' ]; then
+  echo ".env file was not created"
+  exit 1;
+fi

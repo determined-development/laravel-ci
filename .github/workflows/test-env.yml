@@ -1,0 +1,37 @@
+name: Test containers
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  BuildTestbed:
+    uses: ./.github/workflows/build-testbed.yml
+  TestCommand:
+    runs-on: ubuntu-latest
+    needs: BuildTestbed
+    strategy:
+      matrix:
+        php: ["8.0", "8.1", "8.2", "8.3"]
+        test: [composer, env, env-ci]
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        uses: actions/download-artifact@v4
+        with: testbed-${{matrix.php}}
+      -
+        name: Load Container
+        run: |
+          docker load --input /tmp/testbed-${{matrix.php}}.tar
+      -
+        name: Test Composer container
+        run: |
+          docker create --name test -v tests/${{matrix.test}}:/var/www/html testbed/${{matrix.php}}
+          docker run -t test chmod a+x ./test
+          docker run -t test bash -c "./test"
+          docker rm test

@@ -1,4 +1,4 @@
-name: Deploy Docker PrerRse Images
+name: Deploy Docker Release Images
 
 on:
   release:

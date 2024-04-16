@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+build-env -c
+
+if [ ! -d vendor ]; then
+    echo "Vendor not created!";
+    exit 1;
+fi
