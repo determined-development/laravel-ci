@@ -17,20 +17,21 @@ jobs:
         php: ["8.0", "8.1", "8.2", "8.3"]
         test: [composer, env, env-ci]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: testbed-${{matrix.php}}
           path: /tmp
-      -
-        name: Test Composer container
+      - name: Test container
         run: |
           docker load --input /tmp/testbed-${{matrix.php}}.tar
-          docker create --name testbed -v ${pwd}/tests/${{matrix.test}}:/var/www/html testbed-php${{matrix.php}}:latest
-          docker run -t testbed chmod a+x ./test
-          docker run -t testbed bash -c "./test"
+          docker image ls
+          docker create -t -v ${pwd}/tests/${{matrix.test}}:/var/www/html --name testbed testbed-php${{matrix.php}}:latest
+          docker run -t testbed chmod a+x /var/www/html/test
+          docker run -t testbed /var/www/html/test
           docker rm testbed
