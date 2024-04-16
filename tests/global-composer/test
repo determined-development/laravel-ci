@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-composer global require "squizlabs/php_codesniffer=*"
+composer global require --dev --no-interaction --no-scripts --prefer-dist "squizlabs/php_codesniffer"
 
-if [ -f $HOME/.config/composer/vendor/bin/phpcs ]; then
+if [ ! -f "$HOME/.config/composer/vendor/bin/phpcs" ]; then
     echo "Global installation failed";
     exit 1;
 elif [ -z $(phpcs --version) ]; then
