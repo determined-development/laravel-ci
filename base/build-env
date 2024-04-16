@@ -57,6 +57,15 @@ if [ $INSTALL_COMPOSER -eq 1 ]; then
   fi
 fi
 
+load_env() {
+  if [ -f "$1" ]; then
+    echo -e "Loading environment from \`${CODE}$1${ENDCOLOR}\`"
+    set -o allexport
+    source $1
+    set +o allexport
+  fi
+}
+
 if [ $GENERATE_KEY -eq 1 ]; then
   # No .env, but a .env.ci, so use the .env.ci
   if [[ ! -f .env ]] && [[ -f .env.ci ]]; then
@@ -65,17 +74,14 @@ if [ $GENERATE_KEY -eq 1 ]; then
   fi
   # No app key defined, but we have a .env - load it into the environment
   if [[ -z "$APP_KEY" ]] && [[ -f .env ]]; then
-    echo -e "Loading environment from \`${CODE}.env${ENDCOLOR}\`"
-    set -o allexport
-    source .env
-    set +o allexport
+    load_env .env
   fi
   # No app key set. Use artisan to generate one
   if [ -z "$APP_KEY" ]; then
     if [[ $COMPOSER_INSTALLED -eq 1 ]] && [[ -f artisan ]]; then
       echo -e "Generating ${CODE}APP_KEY${ENDCOLOR} with \`${CODE}php artisan key:generate${ENDCOLOR}\`"
-      APP_KEY=$(php artisan key:generate --show);
-      export APP_KEY;
+      php artisan key:generate
+      load_env .env
     elif [ $COMPOSER_INSTALLED -eq 1 ]; then
       echo -e "${RED}Cannot set application key${ENDCOLOR}: \`${CODE}artisan${ENDCOLOR}\` does not exist"
     else
