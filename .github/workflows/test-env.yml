@@ -30,7 +30,7 @@ jobs:
         name: Test Composer container
         run: |
           docker load --input /tmp/testbed-${{matrix.php}}.tar
-          docker create --name testbed -v tests/${{matrix.test}}:/var/www/html testbed-php${{matrix.php}}:latest
+          docker create --name testbed -v ${pwd}/tests/${{matrix.test}}:/var/www/html testbed-php${{matrix.php}}:latest
           docker run -t testbed chmod a+x ./test
           docker run -t testbed bash -c "./test"
           docker rm testbed
