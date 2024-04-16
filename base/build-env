@@ -67,8 +67,8 @@ if [ $GENERATE_KEY -eq 1 ]; then
   if [[ -z "$APP_KEY" ]] && [[ -f .env ]]; then
     echo -e "Loading environment from \`${CODE}.env${ENDCOLOR}\`"
     set -o allexport
-    source .env set
-    +o allexport
+    source .env
+    set +o allexport
   fi
   # No app key set. Use artisan to generate one
   if [ -z "$APP_KEY" ]; then

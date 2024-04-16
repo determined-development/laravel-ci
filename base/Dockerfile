@@ -1,12 +1,12 @@
 FROM ubuntu:22.04
 
-LABEL maintainer="Determined Development"
+ONBUILD ARG WWWGROUP=${WWWGROUP:-1000}
+ONBUILD ARG WWWUSER=${WWWUSER:-1000}
+ONBUILD ARG NODE_VERSION=${NODE_VERSION:-20}
+ONBUILD ARG PHP_VERSION=${PHP_VERSION:-"8.3"}
+ONBUILD ARG POSTGRES_VERSION=${POSTGRES_VERSION:-15}
 
-ARG WWWGROUP=${WWWGROUP:-1000}
-ARG WWWUSER=${WWWUSER:-1000}
-ARG NODE_VERSION=${NODE_VERSION:-20}
-ARG PHP_VERSION=${PHP_VERSION:-"8.3"}
-ARG POSTGRES_VERSION=${POSTGRES_VERSION:-15}
+LABEL maintainer="Determined Development"
 
 WORKDIR /var/www/html
 
@@ -23,7 +23,7 @@ RUN chmod +x /usr/local/bin/start-container \
     && chmod a+x /etc/profile.d/composer-path
 
 RUN apt-get update \
-    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 \
+    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 mysql-client \
     &&  mkdir -p ~/.gnupg \
     && chmod 600 ~/.gnupg \
     && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf \
@@ -33,7 +33,21 @@ RUN apt-get update \
     && echo "deb [signed-by=/usr/share/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu jammy main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
     && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/keyrings/pgdg.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
+ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
+ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
+ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
+ENV SRC_PATH=${SRC_PATH:-"/var/www/html"}
+
+ONBUILD RUN groupadd --force -g $WWWGROUP laravelci
+ONBUILD RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
+ONBUILD RUN cat /etc/profile.d/composer-path >> /home/laravelci/.profile
+
+ONBUILD RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
     && apt-get update \
     && apt-get install -y "php$PHP_VERSION-cli" "php$PHP_VERSION-dev" \
@@ -45,7 +59,6 @@ RUN apt-get update \
        "php$PHP_VERSION-ldap" \
        "php$PHP_VERSION-msgpack" "php$PHP_VERSION-igbinary" \
        "php$PHP_VERSION-memcached" "php$PHP_VERSION-pcov" "php$PHP_VERSION-xdebug" \
-    && apt-get install -y mysql-client \
     && apt-get install -y nodejs \
     && apt-get install -y postgresql-client-$POSTGRES_VERSION \
     && php -r "readfile('https://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
@@ -53,17 +66,4 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN groupadd --force -g $WWWGROUP laravelci
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
-RUN cat /etc/profile.d/composer-path >> /home/laravelci/.profile
-
-ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
-ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
-ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
-ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
-ENV SRC_PATH=${SRC_PATH:-"/var/www/html"}
-
-CMD ["build-env", "-c", "-k"]
-
 ENTRYPOINT ["start-container"]
-

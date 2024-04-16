@@ -1,4 +1,4 @@
-name: Deploy Docker PrerRse Images
+name: Deploy Docker Release Images
 
 on:
   release:
@@ -8,7 +8,14 @@ on:
       - main
 
 jobs:
+  BuildAndDeployBaseImage:
+    uses: ./.github/workflows/build-base.yml
+    with:
+      tags: |
+        ddsam/laravel-ci:latest-onbuild
+        ddsam/laravel-ci:${{github.ref_name}}-onbuild
   BuildAndDeployImages:
+    needs: BuildAndDeployBaseImage
     strategy:
       matrix:
         php: ["8.2", "8.3"]
@@ -26,5 +33,6 @@ jobs:
       args: |
         PHP_VERSION=${{matrix.php}}
         NODE_VERSION=${{matrix.node}}
+        BASE_IMAGE=ddsam/laravel-ci:${{github.ref_name}}-onbuild
     secrets: inherit
 

@@ -8,6 +8,12 @@ on:
       - main
 
 jobs:
+  BuildAndDeployBaseImage:
+    uses: ./.github/workflows/build-base.yml
+    with:
+      tags: |
+        ddsam/laravel-ci:prerelease-onbuild
+        ddsam/laravel-ci:${{github.ref_name}}-prerelease-onbuild
   BuildAndDeployImages:
     strategy:
       matrix:
@@ -27,5 +33,6 @@ jobs:
       args: |
         PHP_VERSION=${{matrix.php}}
         NODE_VERSION=${{matrix.node}}
+        BASE_IMAGE=ddsam/laravel-ci:${{github.ref_name}}-prerelease-onbuild
     secrets: inherit
 

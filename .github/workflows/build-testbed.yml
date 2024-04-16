@@ -1,0 +1,60 @@
+name: Builds testing container
+on:
+  workflow_call:
+
+jobs:
+  BuildTestbed:
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    strategy:
+      matrix:
+        php: ["8.2", "8.3"]
+        node: [20]
+        include:
+          - php: "8.0"
+            node: 16
+          - php: "8.1"
+            node: 18
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      -
+        name: Build base container
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:base"
+          file: Dockerfile
+          tags: localhost:5000/testbed-onbuild:latest
+          push: true
+      -
+        name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:build"
+          file: Dockerfile
+          tags: testbed-php${{matrix.php}}:latest
+          outputs: type=docker,dest=/tmp/testbed-${{matrix.php}}.tar
+          build-args: |
+            PHP_VERSION=${{matrix.php}}
+            NODE_VERSION=${{matrix.node}}
+            BASE_IMAGE=localhost:5000/testbed-onbuild:latest
+      -
+        name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: testbed-${{matrix.php}}
+          path: /tmp/testbed-${{matrix.php}}.tar
+          overwrite: true

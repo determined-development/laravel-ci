@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+composer global require --dev --no-interaction --no-scripts --prefer-dist "squizlabs/php_codesniffer"
+
+if [ ! -f "$HOME/.config/composer/vendor/bin/phpcs" ]; then
+    echo "Global installation failed";
+    exit 1;
+fi
+
+. /etc/profile.d/composer-path
+
+VERSION="$(phpcs --version)"
+
+if [ -z "$VERSION" ]; then
+    echo "Global binary not available";
+    exit 1;
+fi
