@@ -88,7 +88,7 @@ if [ $INSTALL_NODE -eq 1 ]; then
   if [ $NODE_EXISTS -eq 0 ]; then
     echo -e "${RED}Cannot install npm${ENDCOLOR}: Cannot find \`${CODE}${PWD}/package.json${ENDCOLOR}\`"
   else
-    if [ -f package.lock ]; then
+    if [[ -f package-lock.json ]] || [[ -f npm-shrinkwrap.json ]]; then
       echo -e "${GREEN}Installing NPM modules${ENDCOLOR}: running \`${CODE}npm ci${ENDCOLOR}\`"
       npm ci
     else
