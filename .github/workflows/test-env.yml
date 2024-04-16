@@ -23,15 +23,14 @@ jobs:
         uses: docker/setup-buildx-action@v1
       -
         uses: actions/download-artifact@v4
-        with: testbed-${{matrix.php}}
-      -
-        name: Load Container
-        run: |
-          docker load --input /tmp/testbed-${{matrix.php}}.tar
+        with:
+          name: testbed-${{matrix.php}}
+          path: /tmp
       -
         name: Test Composer container
         run: |
-          docker create --name test -v tests/${{matrix.test}}:/var/www/html testbed/${{matrix.php}}
-          docker run -t test chmod a+x ./test
-          docker run -t test bash -c "./test"
-          docker rm test
+          docker load --input /tmp/testbed-${{matrix.php}}.tar
+          docker create --name testbed -v tests/${{matrix.test}}:/var/www/html testbed-php${{matrix.php}}:latest
+          docker run -t testbed chmod a+x ./test
+          docker run -t testbed bash -c "./test"
+          docker rm testbed

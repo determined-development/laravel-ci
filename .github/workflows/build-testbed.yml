@@ -17,27 +17,27 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       -
         name: Build and export
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}:base"
           file: Dockerfile
-          tags: testbed/php${{matrix.php}}:latest
+          tags: testbed-php${{matrix.php}}:latest
           outputs: type=docker,dest=/tmp/testbed-${{matrix.php}}.tar
-          args: |
+          build-args: |
             PHP_VERSION=${{matrix.php}}
             NODE_VERSION=${{matrix.node}}
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: testbed-${{matrix.php}}
           path: /tmp/testbed-${{matrix.php}}.tar
