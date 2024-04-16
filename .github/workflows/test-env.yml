@@ -28,8 +28,7 @@ jobs:
         run: |
           docker load --input /tmp/testbed-${{matrix.php}}.tar
           docker image ls
-          cd tests/${{matrix.test}}
-          docker create -t -v ${pwd}:/var/www/html --name testbed testbed-php${{matrix.php}}
+          docker create -t -v ${{ github.workspace }}/tests/${{matrix.test}}:/var/www/html --name testbed testbed-php${{matrix.php}}
           docker ls -l
           docker run -t testbed chmod a+x /var/www/html/test
           docker run -t testbed /var/www/html/test
