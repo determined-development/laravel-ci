@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+. /etc/profile.d/composer-path
+
 composer global require --dev --no-interaction --no-scripts --prefer-dist "squizlabs/php_codesniffer"
 
 if [ ! -f "$HOME/.config/composer/vendor/bin/phpcs" ]; then
