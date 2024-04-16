@@ -37,7 +37,8 @@ jobs:
             NODE_VERSION=${{matrix.node}}
       -
         name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: testbed-${{matrix.php}}
           path: /tmp/testbed-${{matrix.php}}.tar
+          overwrite: true
