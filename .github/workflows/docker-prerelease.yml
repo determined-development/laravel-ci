@@ -14,6 +14,7 @@ jobs:
       tags: |
         ddsam/laravel-ci:prerelease-onbuild
         ddsam/laravel-ci:${{github.ref_name}}-prerelease-onbuild
+    secrets: inherit
   BuildAndDeployImages:
     needs: BuildAndDeployBaseImage
     strategy:

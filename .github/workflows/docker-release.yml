@@ -14,6 +14,7 @@ jobs:
       tags: |
         ddsam/laravel-ci:latest-onbuild
         ddsam/laravel-ci:${{github.ref_name}}-onbuild
+    secrets: inherit
   BuildAndDeployImages:
     needs: BuildAndDeployBaseImage
     strategy:
