@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. build-env -a
+. build-env -k
 
 if [ -z "$APP_KEY" ]; then
   echo "APP_KEY not set";
