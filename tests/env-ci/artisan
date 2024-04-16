@@ -1,3 +1,11 @@
 <?php
 
-echo "artisan";
+$testKey = 'APP_KEY="artisan"';
+
+$in = file_exists('.env') ? file_get_contents('.env') : 'APP_KEY=""';
+
+$out = preg_match('/^APP_KEY=.*$/', $in)
+    ? preg_replace('/^APP_KEY=.*$/', $testKey, $in)
+    : $in . "\n" . $testKey;
+
+file_put_contents('.env', $out);

@@ -5,7 +5,7 @@
 if [ -z "$APP_KEY" ]; then
   echo "APP_KEY not set";
   exit 1;
-elif [ "$APP_KEY" ne "TEST" ]; then
-  echo "'$APP_KEY' does not match expected value 'test'";
+elif [ "$APP_KEY" != "artisan" ]; then
+  echo "'$APP_KEY' does not match expected value 'artisan'";
   exit 1;
 fi
