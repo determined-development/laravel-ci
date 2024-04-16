@@ -27,6 +27,4 @@ jobs:
       - name: Test container
         run: |
           docker load --input /tmp/testbed-${{matrix.php}}.tar
-          docker image ls
-          docker run -t -v ${{ github.workspace }}/tests/${{matrix.test}}:/var/www/html --name testbed testbed-php${{matrix.php}} chmod a+x /var/www/html/test && /var/www/html/test
-          docker rm testbed
+          docker run --rm -t -v ${{ github.workspace }}/tests/${{matrix.test}}:/var/www/html --name testbed testbed-php${{matrix.php}} bash test
