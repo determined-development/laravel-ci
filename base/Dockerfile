@@ -1,12 +1,12 @@
 FROM ubuntu:22.04
 
-LABEL maintainer="Determined Development"
+ONBUILD ARG WWWGROUP=${WWWGROUP:-1000}
+ONBUILD ARG WWWUSER=${WWWUSER:-1000}
+ONBUILD ARG NODE_VERSION=${NODE_VERSION:-20}
+ONBUILD ARG PHP_VERSION=${PHP_VERSION:-"8.3"}
+ONBUILD ARG POSTGRES_VERSION=${POSTGRES_VERSION:-15}
 
-ARG WWWGROUP=${WWWGROUP:-1000}
-ARG WWWUSER=${WWWUSER:-1000}
-ARG NODE_VERSION=${NODE_VERSION:-20}
-ARG PHP_VERSION=${PHP_VERSION:-"8.3"}
-ARG POSTGRES_VERSION=${POSTGRES_VERSION:-15}
+LABEL maintainer="Determined Development"
 
 WORKDIR /var/www/html
 
@@ -37,15 +37,15 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN groupadd --force -g $WWWGROUP laravelci
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
-RUN cat /etc/profile.d/composer-path >> /home/laravelci/.profile
-
 ENV CACHE_DRIVER=${CACHE_DRIVER:-"array"}
 ENV SESSION_DRIVER=${SESSION_DRIVER:-"file"}
 ENV QUEUE_CONNECTION=${QUEUE_CONNECTION:-"sync"}
 ENV MAIL_MAILER=${MAIL_MAILER:-"array"}
 ENV SRC_PATH=${SRC_PATH:-"/var/www/html"}
+
+ONBUILD RUN groupadd --force -g $WWWGROUP laravelci
+ONBUILD RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER laravelci
+ONBUILD RUN cat /etc/profile.d/composer-path >> /home/laravelci/.profile
 
 ONBUILD RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
