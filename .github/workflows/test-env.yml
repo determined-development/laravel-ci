@@ -14,7 +14,7 @@ jobs:
     needs: BuildTestbed
     strategy:
       matrix:
-        php: ["8.0", "8.1", "8.2", "8.3"]
+        php: ["8.0", "8.1", "8.2", "8.3", "8.4"]
         test: [composer, env, env-ci, global-composer, artisan]
       fail-fast: false
     steps:
