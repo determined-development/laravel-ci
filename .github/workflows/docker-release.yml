@@ -19,8 +19,8 @@ jobs:
     needs: BuildAndDeployBaseImage
     strategy:
       matrix:
-        php: ["8.2", "8.3"]
-        node: [20]
+        php: ["8.2", "8.3", "8.4"]
+        node: [22]
         include:
           - php: "8.0"
             node: 16

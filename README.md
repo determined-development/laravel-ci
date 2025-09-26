@@ -40,14 +40,14 @@ Your own container can be built from the relevant onbuild image with the followi
 |--------------------|----------------------------------------|--------------------|
 | `WWWUSER`          | The user ID to run as internally.      | `$UID` or `1000`   |
 | `WWWGROUP`         | The user group to run as internally.   | `$GROUP` or `1000` |
-| `PHP_VERSION`      | The PHP version to install             | `8.3`              |
+| `PHP_VERSION`      | The PHP version to install             | `8.4`              |
 | `NODE_VERSION`     | Node version to install                | `20`               |
 | `POSTGRES_VERSION` | The postgres client version to install | `15`               |
 
 #### Example
 
 ```dockerfile
-ARG PHP_VERSION=8.3
+ARG PHP_VERSION=8.4
 ARG NODE_VERSION=21
 
 FROM ddsam/laravel-ci:latest-onbuild
@@ -132,8 +132,9 @@ The current supported versions are:
 
 * `ddsam/laravel-ci:php8.0-latest` - PHP 8.0, Node 16 (default)
 * `ddsam/laravel-ci:php8.1-latest` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2-latest` - PHP 8.2, Node 20 (default)
-* `ddsam/laravel-ci:php8.3-latest` - PHP 8.3, Node 20 (default)
+* `ddsam/laravel-ci:php8.2-latest` - PHP 8.2, Node 22 (default)
+* `ddsam/laravel-ci:php8.3-latest` - PHP 8.3, Node 22 (default)
+* `ddsam/laravel-ci:php8.4-latest` - PHP 8.4, Node 22 (default)
 
 ### Pre-release versions
 
@@ -141,5 +142,6 @@ Pre-releases get published as:
 
 * `ddsam/laravel-ci:php8.0-prerelease` - PHP 8.0, Node 16 (default)
 * `ddsam/laravel-ci:php8.1-prerelease` - PHP 8.1, Node 16 (default)
-* `ddsam/laravel-ci:php8.2-prerelease` - PHP 8.2, Node 20 (default)
-* `ddsam/laravel-ci:php8.3-prerelease` - PHP 8.3, Node 20 (default)
+* `ddsam/laravel-ci:php8.2-prerelease` - PHP 8.2, Node 22 (default)
+* `ddsam/laravel-ci:php8.3-prerelease` - PHP 8.3, Node 22 (default)
+* `ddsam/laravel-ci:php8.4-prerelease` - PHP 8.4, Node 22 (default)
